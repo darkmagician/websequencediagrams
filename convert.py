@@ -1,7 +1,8 @@
-import urllib
 import re
 import os
 import sys
+import urllib.parse
+import urllib.request
 
 
 def getSequenceDiagram( text, outputFile, style = 'default' ):
@@ -10,11 +11,12 @@ def getSequenceDiagram( text, outputFile, style = 'default' ):
 	request["style"] = style
 	request["apiVersion"] = "1"
 
-	url = urllib.urlencode(request)
+	data = urllib.parse.urlencode(request)
 
-	f = urllib.urlopen("http://www.websequencediagrams.com/", url)
-	line = f.readline()
+	f = urllib.request.urlopen("http://www.websequencediagrams.com/",data.encode()) 
+	line = f.readline().decode()
 	f.close()
+
 
 	print(line)
 
@@ -25,7 +27,7 @@ def getSequenceDiagram( text, outputFile, style = 'default' ):
 		print('Invalid response from server.')
 		return False
 
-	urllib.urlretrieve("http://www.websequencediagrams.com/" + m.group(0),
+	urllib.request.urlretrieve("http://www.websequencediagrams.com/" + m.group(0),
 			outputFile )
 	return True
 
@@ -42,7 +44,7 @@ if __name__ == '__main__':
 		files = [f for f in os.listdir(input) if f.endswith('.seq')]
 		print(files)
 		for f in files:
-			convert(f,style)
+			convert(os.path.join(input,f),style)
 	elif os.path.exists(input):
 		convert(input,style)
 	else:
